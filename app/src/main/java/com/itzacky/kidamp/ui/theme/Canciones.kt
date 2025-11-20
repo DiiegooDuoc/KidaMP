@@ -1,10 +1,11 @@
 package com.itzacky.kidamp.ui.theme
 
-// Todos los imports que necesitas. Añadimos los de la lista (LazyColumn).
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
@@ -15,66 +16,118 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.itzacky.kidamp.R
 import com.itzacky.kidamp.viewmodel.CancionViewModel
+import androidx.compose.material3.TextFieldDefaults
+
+val limiteMaximoNombre = 50
+val limiteMaximoArtista = 30
+val limiteMaximoAlbum = 40
 
 @Composable
 fun Canciones(viewModel: CancionViewModel) {
-    // --- 1. OBSERVAMOS TODOS LOS DATOS DEL VIEWMODEL ---
-    // Los campos de texto
+
     val nombre by viewModel.nombre_cancion.collectAsState()
     val artista by viewModel.autor_cancion.collectAsState()
     val album by viewModel.album_cancion.collectAsState()
     // La lista de canciones
     val canciones by viewModel.canciones.collectAsState()
 
-    // Usaremos un único Column para toda la pantalla
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(52.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
 
         // =======================================================
         // --- 2. SECCIÓN DEL FORMULARIO (PARA AÑADIR CANCIONES) ---
         // =======================================================
 
+
+
+
         Text(
             text = "Recopilador de Música",
             color = Color.White,
+            fontSize = 24.sp,
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 14.dp)
         )
 
         Image(
             painter = painterResource(id = R.drawable.music),
             contentDescription = "Musica",
             modifier = Modifier
-                .width(150.dp) // Un poco más pequeño para dar espacio a la lista
-                .height(150.dp)
+                .width(85.dp)
+                .height(85.dp)
+                .padding(bottom = 16.dp),
         )
 
         OutlinedTextField(
             value = nombre,
-            onValueChange = { viewModel.onNombreChange(it) },
+            onValueChange = { nuevoTexto ->
+                if (nuevoTexto.length <= limiteMaximoNombre) {
+                    viewModel.onNombreChange(nuevoTexto)
+                }
+            },
             label = { Text("Nombre de la Canción") },
-            modifier = Modifier.fillMaxWidth() // Ocupa todo el ancho
+            modifier = Modifier.fillMaxWidth(), //
+            colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+            ),
+            trailingIcon = {
+                Text(
+                    text = "${nombre.length} / $limiteMaximoNombre",
+                    modifier = Modifier.padding(end = 12.dp, start = 8.dp),
+                    color = Color.Gray
+                )
+            }
         )
 
         OutlinedTextField(
             value = artista,
-            onValueChange = { viewModel.onArtistaChange(it) },
+            onValueChange = { nuevoTexto ->
+                if (nuevoTexto.length <= limiteMaximoArtista) {
+                    viewModel.onArtistaChange(nuevoTexto)
+                }
+            },
             label = { Text("Nombre del Artista") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+            ),
+            trailingIcon = {
+                Text(
+                    text = "${artista.length} / $limiteMaximoArtista",
+                    modifier = Modifier.padding(end = 12.dp, start = 8.dp),
+                    color = Color.Gray
+                )
+            }
         )
 
         OutlinedTextField(
             value = album,
-            onValueChange = { viewModel.onAlbumChange(it) },
+            onValueChange = { nuevoTexto ->
+                if (nuevoTexto.length <= limiteMaximoAlbum) {
+                    viewModel.onAlbumChange(nuevoTexto)
+                }
+            },
             label = { Text("Nombre del Album") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(), //
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+            ),
+            trailingIcon = {
+                Text(
+                    text = "${album.length} / $limiteMaximoAlbum",
+                    modifier = Modifier.padding(end = 12.dp, start = 8.dp),
+                    color = Color.Gray
+                )
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -91,7 +144,7 @@ fun Canciones(viewModel: CancionViewModel) {
                     Toast.makeText(context, "Por favor, rellena todos los campos", Toast.LENGTH_SHORT).show()
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text("Agregar Canción")
         }
@@ -140,4 +193,3 @@ fun Canciones(viewModel: CancionViewModel) {
         }
     }
 }
-

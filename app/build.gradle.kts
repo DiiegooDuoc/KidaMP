@@ -76,4 +76,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // El núcleo de Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // El conversor de JSON a objetos Kotlin (Gson)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    // (Opcional, pero muy recomendado) Interceptor para ver las llamadas en el Logcat
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 }

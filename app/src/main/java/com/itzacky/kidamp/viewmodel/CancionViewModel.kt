@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 
 class CancionViewModel(private val repository: CancionRepository) : ViewModel() {
 
-    // --- CAMPOS DE TEXTO OBSERVABLES POR LA VISTA ---
     // Hacemos uno privado (mutable) y uno público (inmutable) para proteger los datos.
     private val _nombre_cancion = MutableStateFlow("")
     val nombre_cancion = _nombre_cancion.asStateFlow()
@@ -37,8 +36,6 @@ class CancionViewModel(private val repository: CancionRepository) : ViewModel() 
             }
         }
     }
-
-    // --- FUNCIONES AÑADIDAS PARA LA VISTA (Canciones.kt) ---
 
     /**
      * Actualiza el valor del nombre de la canción cada vez que el usuario escribe.
@@ -69,15 +66,12 @@ class CancionViewModel(private val repository: CancionRepository) : ViewModel() 
      */
     fun agregarCancion() {
         viewModelScope.launch {
-            // Construimos el objeto Cancion con los valores actuales
             val nuevaCancion = Cancion(
-                nombre_cancion = _nombre_cancion.value, // <--- CORREGIDO
-                autor_cancion = _autor_cancion.value,  // <--- CORREGIDO
-                album_cancion = _album_cancion.value   // <--- CORREGIDO
+                nombre_cancion = _nombre_cancion.value,
+                autor_cancion = _autor_cancion.value,
+                album_cancion = _album_cancion.value
             )
-            // Llamamos al repositorio para que la inserte
             repository.insert(nuevaCancion)
-            // La lista en la UI se actualizará sola gracias al Flow.
         }
     }
 

@@ -37,7 +37,6 @@ class MainActivity : ComponentActivity() {
 
     private val viewModelCanciones by lazy { CancionViewModel(repository) }
 
-
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContent{
