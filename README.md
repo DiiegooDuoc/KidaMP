@@ -1,16 +1,7 @@
-\# KiraMP
+# KiraMP
 
-
-
-\## ES
-
+## ES
 El mejor reproductor de musica, KiraMP.
 
-
-
-\## EN
-
+## EN
 The best music player, KiraMP.
-
-
-
