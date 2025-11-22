@@ -5,90 +5,33 @@ import androidx.lifecycle.viewModelScope
 import com.itzacky.kidamp.model.Cancion
 import com.itzacky.kidamp.repository.CancionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class CancionViewModel(private val repository: CancionRepository) : ViewModel() {
 
-    // Hacemos uno privado (mutable) y uno público (inmutable) para proteger los datos.
-    private val _nombre_cancion = MutableStateFlow("")
-    val nombre_cancion = _nombre_cancion.asStateFlow()
-
-    private val _autor_cancion = MutableStateFlow("")
-    val autor_cancion = _autor_cancion.asStateFlow()
-
-    private val _album_cancion = MutableStateFlow("")
-    val album_cancion = _album_cancion.asStateFlow()
-
-
-    // --- LISTA DE CANCIONES OBSERVABLE POR LA VISTA ---
+    // Expone el estado de la lista de canciones a la UI.
     private val _canciones = MutableStateFlow<List<Cancion>>(emptyList())
-    val canciones = _canciones.asStateFlow()
+    val canciones: StateFlow<List<Cancion>> = _canciones.asStateFlow()
 
     init {
+        // Se inicia la carga de canciones en cuanto el ViewModel es creado.
         cargarCanciones()
     }
 
     private fun cargarCanciones() {
         viewModelScope.launch {
-            repository.getAll().collect { listaDeCanciones ->
-                _canciones.value = listaDeCanciones
-            }
-        }
-    }
-
-    /**
-     * Actualiza el valor del nombre de la canción cada vez que el usuario escribe.
-     * Llamada desde el `onValueChange` del TextField.
-     */
-    fun onNombreChange(nombre: String) {
-        _nombre_cancion.value = nombre
-    }
-
-    /**
-     * Actualiza el valor del autor de la canción.
-     */
-    fun onArtistaChange(artista: String) {
-        _autor_cancion.value = artista
-    }
-
-    /**
-     * Actualiza el valor del álbum de la canción.
-     */
-    fun onAlbumChange(album: String) {
-        _album_cancion.value = album
-    }
-
-    /**
-     * Agrega la canción a la base de datos.
-     * Toma los valores actuales de los StateFlows.
-     * No necesita parámetros.
-     */
-    fun agregarCancion() {
-        viewModelScope.launch {
-            val nuevaCancion = Cancion(
-                nombre_cancion = _nombre_cancion.value,
-                autor_cancion = _autor_cancion.value,
-                album_cancion = _album_cancion.value
-            )
-            repository.insert(nuevaCancion)
-        }
-    }
-
-    /**
-     * Limpia los campos de texto después de agregar una canción.
-     * Llamada desde el `onClick` del botón en Canciones.kt.
-     */
-    fun limpiarCampos() {
-        _nombre_cancion.value = ""
-        _autor_cancion.value = ""
-        _album_cancion.value = ""
-    }
-
-    fun eliminarCancion(cancion: Cancion) {
-        viewModelScope.launch {
-            repository.delete(cancion)
+            repository.getCancionesStream()
+                .catch { e ->
+                    // Opcional: Manejar errores, por si la llamada a la API falla.
+                    // Por ahora, simplemente dejamos la lista vacía.
+                    _canciones.value = emptyList()
+                }
+                .collect { listaDeCanciones ->
+                    _canciones.value = listaDeCanciones
+                }
         }
     }
 }
-

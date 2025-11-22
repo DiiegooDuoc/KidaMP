@@ -62,12 +62,6 @@ dependencies {
     // ViewModel para Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3") // O la versión que tengas definida
 
-    // --- Dependencias de Room ---
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    // Se usa 'ksp' para el procesador de anotaciones de Room
-    ksp(libs.androidx.room.compiler)
-
     // Dependencias de Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

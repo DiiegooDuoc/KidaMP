@@ -1,6 +1,5 @@
 package com.itzacky.kidamp.api
 
-import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class Post(

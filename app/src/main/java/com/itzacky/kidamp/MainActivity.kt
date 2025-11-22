@@ -3,48 +3,39 @@ package com.itzacky.kidamp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.itzacky.kidamp.ui.theme.KidaMPTheme
-import kotlin.getValue
-import androidx.room.*
-import com.itzacky.kidamp.model.AppDatabase
-import com.itzacky.kidamp.model.Cancion
 import com.itzacky.kidamp.repository.CancionRepository
 import com.itzacky.kidamp.ui.theme.Canciones
+import com.itzacky.kidamp.ui.theme.KidaMPTheme
 import com.itzacky.kidamp.viewmodel.CancionViewModel
 
 class MainActivity : ComponentActivity() {
-
-
-    private val db by lazy{
-        Room.databaseBuilder(
-            applicationContext,
-            klass = AppDatabase::class.java,
-            name = "SongsDB"
-        ).build()
-    }
-
-
-    private val repository by lazy { CancionRepository(dao = db.cancionDao()) }
-
-    private val viewModelCanciones by lazy { CancionViewModel(repository) }
-
-    override fun onCreate(savedInstanceState: Bundle?){
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent{
-            KidaMPTheme{
-                Canciones (viewModel = viewModelCanciones)
+        setContent {
+            KidaMPTheme {
+                // Instanciamos el repositorio directamente. Ya no depende de la base de datos.
+                val repository = CancionRepository()
+
+                // Usamos el 'viewModel' composable para crear/obtener el ViewModel.
+                // Le pasamos una factory simple para que sepa cómo construir el ViewModel con nuestro repositorio.
+                val viewModel: CancionViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            if (modelClass.isAssignableFrom(CancionViewModel::class.java)) {
+                                @Suppress("UNCHECKED_CAST")
+                                return CancionViewModel(repository) as T
+                            }
+                            throw IllegalArgumentException("Unknown ViewModel class")
+                        }
+                    }
+                )
+
+                // Pasamos el ViewModel a nuestro Composable de Canciones
+                Canciones(viewModel = viewModel)
             }
         }
     }
-
-
 }

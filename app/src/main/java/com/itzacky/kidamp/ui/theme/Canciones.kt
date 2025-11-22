@@ -1,11 +1,8 @@
 package com.itzacky.kidamp.ui.theme
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
@@ -13,25 +10,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.itzacky.kidamp.R
+import com.itzacky.kidamp.model.Cancion
 import com.itzacky.kidamp.viewmodel.CancionViewModel
-import androidx.compose.material3.TextFieldDefaults
-
-val limiteMaximoNombre = 50
-val limiteMaximoArtista = 30
-val limiteMaximoAlbum = 40
 
 @Composable
 fun Canciones(viewModel: CancionViewModel) {
 
-    val nombre by viewModel.nombre_cancion.collectAsState()
-    val artista by viewModel.autor_cancion.collectAsState()
-    val album by viewModel.album_cancion.collectAsState()
-    // La lista de canciones
+    // La lista de canciones que se obtiene desde la API
     val canciones by viewModel.canciones.collectAsState()
 
     Column(
@@ -40,15 +29,8 @@ fun Canciones(viewModel: CancionViewModel) {
             .background(Color.Black)
             .padding(52.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Top // Pequeño ajuste para que el contenido se alinee arriba
     ) {
-
-        // =======================================================
-        // --- 2. SECCIÓN DEL FORMULARIO (PARA AÑADIR CANCIONES) ---
-        // =======================================================
-
-
-
 
         Text(
             text = "Recopilador de Música",
@@ -67,93 +49,7 @@ fun Canciones(viewModel: CancionViewModel) {
                 .padding(bottom = 16.dp),
         )
 
-        OutlinedTextField(
-            value = nombre,
-            onValueChange = { nuevoTexto ->
-                if (nuevoTexto.length <= limiteMaximoNombre) {
-                    viewModel.onNombreChange(nuevoTexto)
-                }
-            },
-            label = { Text("Nombre de la Canción") },
-            modifier = Modifier.fillMaxWidth(), //
-            colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-            ),
-            trailingIcon = {
-                Text(
-                    text = "${nombre.length} / $limiteMaximoNombre",
-                    modifier = Modifier.padding(end = 12.dp, start = 8.dp),
-                    color = Color.Gray
-                )
-            }
-        )
-
-        OutlinedTextField(
-            value = artista,
-            onValueChange = { nuevoTexto ->
-                if (nuevoTexto.length <= limiteMaximoArtista) {
-                    viewModel.onArtistaChange(nuevoTexto)
-                }
-            },
-            label = { Text("Nombre del Artista") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-            ),
-            trailingIcon = {
-                Text(
-                    text = "${artista.length} / $limiteMaximoArtista",
-                    modifier = Modifier.padding(end = 12.dp, start = 8.dp),
-                    color = Color.Gray
-                )
-            }
-        )
-
-        OutlinedTextField(
-            value = album,
-            onValueChange = { nuevoTexto ->
-                if (nuevoTexto.length <= limiteMaximoAlbum) {
-                    viewModel.onAlbumChange(nuevoTexto)
-                }
-            },
-            label = { Text("Nombre del Album") },
-            modifier = Modifier.fillMaxWidth(), //
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-            ),
-            trailingIcon = {
-                Text(
-                    text = "${album.length} / $limiteMaximoAlbum",
-                    modifier = Modifier.padding(end = 12.dp, start = 8.dp),
-                    color = Color.Gray
-                )
-            }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        val context = LocalContext.current
-
-        Button(
-            onClick = {
-                if (nombre.isNotBlank() && artista.isNotBlank() && album.isNotBlank()) {
-                    viewModel.agregarCancion()
-                    Toast.makeText(context, "Canción agregada", Toast.LENGTH_SHORT).show()
-                    viewModel.limpiarCampos()
-                } else {
-                    Toast.makeText(context, "Por favor, rellena todos los campos", Toast.LENGTH_SHORT).show()
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text("Agregar Canción")
-        }
-
-        // =======================================================
-        // --- 3. SECCIÓN DE LA LISTA (PARA MOSTRAR CANCIONES) ---
-        // =======================================================
-
-        Spacer(modifier = Modifier.height(24.dp)) // Un espacio más grande para separar
+        Spacer(modifier = Modifier.height(24.dp))
 
         Text(
             text = "Tu Biblioteca",
@@ -163,33 +59,39 @@ fun Canciones(viewModel: CancionViewModel) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // La lista de canciones mantiene su diseño original
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
             items(canciones) { cancion ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = cancion.nombre_cancion,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "Artista: ${cancion.autor_cancion}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.LightGray
-                        )
-                        Text(
-                            text = "Álbum: ${cancion.album_cancion}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.LightGray
-                        )
-                    }
-                }
+                CancionCard(cancion = cancion) // Usamos un Composable separado para la tarjeta
             }
+        }
+    }
+}
+
+@Composable
+fun CancionCard(cancion: Cancion) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = cancion.nombre_cancion,
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White
+            )
+            Text(
+                text = "Artista: ${cancion.autor_cancion}",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.LightGray
+            )
+            Text(
+                text = "Álbum: ${cancion.album_cancion}",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.LightGray
+            )
         }
     }
 }

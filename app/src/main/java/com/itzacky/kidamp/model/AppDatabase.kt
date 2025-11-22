@@ -1,9 +1,3 @@
 package com.itzacky.kidamp.model
 
-import androidx.room.*
-
-@Database(entities = [Cancion::class], version = 1)
-abstract class AppDatabase : RoomDatabase(){
-
-    abstract fun cancionDao(): CancionDao
-}
+// Archivo vacío intencionadamente. La base de datos Room ya no se utiliza en este proyecto.
