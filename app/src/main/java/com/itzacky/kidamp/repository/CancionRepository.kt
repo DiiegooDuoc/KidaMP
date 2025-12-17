@@ -7,25 +7,48 @@ import kotlinx.coroutines.flow.flow
 
 class CancionRepository {
 
-    /**
-     * Obtiene las canciones desde la API y las emite como un Flow.
-     * Esto permite que el ViewModel observe los datos de forma reactiva,
-     * manteniendo un patrón de diseño consistente.
-     */
     fun getCancionesStream(): Flow<List<Cancion>> = flow {
         try {
             val response = RetrofitClient.apiService.getCanciones()
             if (response.isSuccessful) {
-                // Si la respuesta es exitosa, emitimos la lista de canciones.
-                // Si el body es null, emitimos una lista vacía.
                 emit(response.body() ?: emptyList())
             } else {
-                // En caso de error en la respuesta (ej: 404, 500), emitimos una lista vacía.
                 emit(emptyList())
             }
         } catch (e: Exception) {
-            // En caso de una excepción (ej: sin conexión a internet), emitimos una lista vacía.
             emit(emptyList())
+        }
+    }
+
+    suspend fun crearCancion(cancion: Cancion): Boolean {
+        return try {
+            val response = RetrofitClient.apiService.crearCancion(cancion)
+            response.isSuccessful
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun eliminarCancion(cancion: Cancion): Boolean {
+        return try {
+            val response = RetrofitClient.apiService.eliminarCancion(cancion)
+            response.isSuccessful
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Llama a la API para actualizar una canción existente en el servidor.
+     * @param cancion El objeto Cancion con los datos actualizados.
+     * @return Devuelve true si la actualización fue exitosa, false en caso contrario.
+     */
+    suspend fun actualizarCancion(cancion: Cancion): Boolean {
+        return try {
+            val response = RetrofitClient.apiService.actualizarCancion(cancion)
+            response.isSuccessful
+        } catch (e: Exception) {
+            false
         }
     }
 }
